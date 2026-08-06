@@ -1,0 +1,135 @@
+.os-window {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  background: color-mix(in srgb, var(--bg-surface) 92%, transparent);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-soft);
+  box-shadow: var(--shadow-window);
+  overflow: hidden;
+  min-width: 300px;
+  min-height: 260px;
+}
+
+.os-window--fullscreen {
+  border-radius: 0;
+  border: none;
+}
+
+.os-window--active {
+  box-shadow: var(--shadow-window), 0 0 0 1px var(--border-strong);
+}
+
+.os-window__titlebar {
+  display: flex;
+  align-items: center;
+  height: 42px;
+  min-height: 42px;
+  padding: 0 14px;
+  background: color-mix(in srgb, var(--bg-surface-alt) 88%, transparent);
+  border-bottom: 1px solid var(--border-soft);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.os-window--fullscreen .os-window__titlebar { cursor: default; }
+.os-window__titlebar:active { cursor: grabbing; }
+
+.os-window__title {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: var(--font-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: 0.01em;
+  margin-left: -68px;
+}
+
+.os-window__titlebar-spacer { width: 68px; }
+
+.os-window__body {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
+  background: var(--bg-surface);
+  /* Reserved by Window.jsx (via --dock-reserve) when the dock is forced to
+     stay Always Visible over a maximized/very tall window, so the last bit
+     of content never ends up hidden underneath it. */
+  padding-bottom: var(--dock-reserve, 0px);
+  transition: padding-bottom 250ms ease;
+}
+
+.window-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 68px;
+}
+
+.window-dot {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  position: relative;
+}
+
+.window-dot__glyph {
+  font-size: 10px;
+  line-height: 1;
+  opacity: 0;
+  color: rgba(0,0,0,0.55);
+  transition: opacity var(--transition-fast);
+}
+
+.window-controls:hover .window-dot__glyph,
+.window-dot:focus-visible .window-dot__glyph {
+  opacity: 1;
+}
+
+.window-dot--close { background: #f2a3a1; }
+.window-dot--minimize { background: #f4cf94; }
+.window-dot--maximize { background: #a9d4ac; }
+
+.os-window__resize-handle {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 18px;
+  height: 18px;
+  cursor: nwse-resize;
+  touch-action: none;
+}
+
+.os-window__resize-handle::after {
+  content: "";
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid var(--border-strong);
+  border-bottom: 2px solid var(--border-strong);
+  border-radius: 0 0 2px 0;
+}
+
+@media (max-width: 768px) {
+  .os-window {
+    border-radius: 0;
+  }
+  .os-window__titlebar {
+    height: 48px;
+  }
+}

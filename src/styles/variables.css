@@ -1,0 +1,83 @@
+:root {
+  /* ---- Palette (warm, soft, dreamy — greens pulled from the wallpaper's
+     Minecraft foliage instead of the original orange/pink sunset tones) ---- */
+  --color-cream: #faf3e9;
+  --color-warm-white: #fdf9f4;
+  --color-off-white: #f6f1ea;
+  --color-beige: #ece2d3;
+  --color-dusty-pink: #e3b8bc;
+  --color-lavender: #c8bfe0;
+  --color-sage: #bcd6a3;
+  --color-sky-blue: #aecbe0;
+  --color-forest-green: #6f9b5c;
+  --color-moss: #4f7245;
+  --color-dark-brown: #4a3529;
+  --color-charcoal: #2c2622;
+
+  --color-mac-folder: #6fb1e8;
+  --color-mac-folder-shadow: #4a8fc9;
+
+  /* Semantic tokens (light) */
+  --bg-app: var(--color-cream);
+  --bg-surface: var(--color-warm-white);
+  --bg-surface-alt: var(--color-off-white);
+  --bg-elevated: #ffffff;
+  --text-primary: var(--color-charcoal);
+  --text-secondary: #6b5d52;
+  --text-muted: #8f8175;
+  --text-inverse: var(--color-warm-white);
+  --border-soft: rgba(74, 53, 41, 0.12);
+  --border-strong: rgba(74, 53, 41, 0.22);
+  --accent: var(--color-forest-green);
+  --accent-soft: var(--color-sage);
+  --accent-secondary: var(--color-lavender);
+  --shadow-color: 26, 20, 15;
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-pill: 999px;
+
+  --shadow-sm: 0 2px 8px rgba(var(--shadow-color), 0.08);
+  --shadow-md: 0 8px 24px rgba(var(--shadow-color), 0.14);
+  --shadow-lg: 0 20px 50px rgba(var(--shadow-color), 0.22);
+  --shadow-window: 0 24px 60px rgba(var(--shadow-color), 0.28), 0 2px 8px rgba(var(--shadow-color), 0.12);
+
+  /* Renders as real San Francisco on iOS/macOS; falls back to each OS's
+     native system font elsewhere (no webfont file — SF Pro isn't licensed
+     for embedding). */
+  --font-ios: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui, "Segoe UI", Roboto, sans-serif;
+  /* Every text token site-wide now points at the iPhone system font — only
+     --font-brand (the "The World of Rehi" wordmark) is kept separate below. */
+  --font-primary: var(--font-ios);
+  --font-secondary: var(--font-ios);
+  --font-display: var(--font-ios);
+  --font-brand: "Space Grotesk", -apple-system, BlinkMacSystemFont, sans-serif;
+
+  --menubar-height: 30px;
+  --dock-height: 76px;
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  --transition-slow: 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+[data-theme="dark"] {
+  --bg-app: #201a16;
+  --bg-surface: #2a231e;
+  --bg-surface-alt: #241e19;
+  --bg-elevated: #2f2822;
+  --text-primary: #f3ece3;
+  --text-secondary: #cbbfb2;
+  --text-muted: #9a8c7d;
+  --text-inverse: var(--color-charcoal);
+  --border-soft: rgba(255, 245, 235, 0.1);
+  --border-strong: rgba(255, 245, 235, 0.18);
+  --shadow-color: 0, 0, 0;
+}
+
+[data-reduce-motion="true"] * {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}

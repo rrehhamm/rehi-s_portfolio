@@ -1,0 +1,112 @@
+.qalab__content { padding-top: 18px; }
+
+.qalab__checklist-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  font-family: var(--font-secondary);
+  padding: 10px 12px;
+}
+.qalab__checklist-item svg { color: #6fae72; flex-shrink: 0; }
+
+.qalab__before-after {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.qalab__note {
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.qalab__bug-card {
+  text-align: left;
+  cursor: pointer;
+  background: var(--bg-surface-alt);
+}
+.qalab__bug-id { font-family: var(--font-secondary); font-size: 11px; color: var(--text-muted); }
+.qalab__bug-title { font-weight: 600; font-size: 13px; margin: 3px 0; }
+.qalab__bug-module { font-size: 11.5px; color: var(--text-muted); }
+
+.qalab__detail-card {
+  max-width: 560px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+  padding: 22px;
+}
+.qalab__detail-close {
+  position: absolute;
+  top: 14px; right: 14px;
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  border: none;
+  background: var(--border-soft);
+  display: flex; align-items: center; justify-content: center;
+}
+.qalab__detail-title { font-size: 17px; padding-right: 24px; }
+
+.qalab__api-layout {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+.qalab__api-list {
+  width: 240px;
+  flex-shrink: 0;
+  max-height: 480px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.qalab__api-group-title {
+  font-family: var(--font-secondary);
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin: 0 0 4px 2px;
+}
+.qalab__api-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface-alt);
+  border: 1px solid var(--border-soft);
+  font-size: 11.5px;
+  text-align: left;
+  width: 100%;
+  margin-bottom: 4px;
+}
+.qalab__api-row--active { background: var(--accent-soft); border-color: transparent; }
+.qalab__api-endpoint { font-family: var(--font-secondary); color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.qalab__api-endpoint-code { font-size: 13px; font-family: monospace; }
+
+.qalab__api-detail { flex: 1; min-width: 0; }
+.qalab__api-status-row { display: flex; gap: 24px; margin: 14px 0; }
+.qalab__code-block {
+  background: var(--bg-app);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: 11.5px;
+  font-family: "SFMono-Regular", Consolas, monospace;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+@media (max-width: 640px) {
+  .qalab__api-layout { flex-direction: column; }
+  .qalab__api-list { width: 100%; max-height: 260px; }
+  .qalab__before-after { grid-template-columns: 1fr; }
+}

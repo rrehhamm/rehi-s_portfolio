@@ -1,0 +1,78 @@
+.desktop {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+}
+
+.desktop__wallpaper {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.desktop__ambient {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.desktop__particle {
+  position: absolute;
+  top: 100%;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(255, 244, 224, 0.55);
+  box-shadow: 0 0 6px rgba(255, 224, 170, 0.6);
+  animation: float-up 16s linear infinite;
+}
+
+.desktop__particle--1 { width: 2px; height: 2px; background: rgba(255, 255, 255, 0.4); }
+.desktop__particle--2 { animation-duration: 20s; }
+.desktop__particle--3 { width: 4px; height: 4px; animation-duration: 13s; }
+.desktop__particle--4 { animation-duration: 24s; opacity: 0.6; }
+
+@keyframes float-up {
+  0% { transform: translateY(0) translateX(0); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 0.7; }
+  100% { transform: translateY(-100vh) translateX(12px); opacity: 0; }
+}
+
+.desktop__icon-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.desktop__icon-layer .desktop-icon {
+  pointer-events: auto;
+}
+
+.desktop-icon--displaced {
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 0 1px rgba(255, 200, 140, 0.35);
+}
+
+@media (max-width: 768px) {
+  .desktop__icon-layer {
+    position: static;
+    display: grid;
+    /* Auto-fills 2-3 columns depending on screen width instead of a fixed
+       count, so narrow phones get 2 and wider ones get 3. */
+    grid-template-columns: repeat(auto-fill, minmax(108px, 1fr));
+    justify-items: center;
+    gap: 4px;
+    padding: calc(var(--menubar-height) + 14px) 10px calc(var(--dock-height) + 16px);
+  }
+
+  .desktop__icon-layer .desktop-icon {
+    position: static !important;
+  }
+}
+
+[data-reduce-motion="true"] .desktop__particle { display: none; }

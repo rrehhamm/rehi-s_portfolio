@@ -1,0 +1,54 @@
+.letterboxd-window__profile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+  padding: 10px 0 24px;
+}
+
+.letterboxd-window__avatar {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #14181c;
+  margin-bottom: 6px;
+}
+.letterboxd-window__avatar img { width: 100%; height: 100%; object-fit: cover; }
+.letterboxd-window__avatar-mark { width: 60%; height: 60%; object-fit: contain; }
+
+.letterboxd-window__username { font-family: var(--font-secondary); font-weight: 700; font-size: 14px; }
+.letterboxd-window__bio { font-size: 12.5px; color: var(--text-secondary); max-width: 320px; line-height: 1.55; margin-bottom: 8px; }
+
+.letterboxd-window__films {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 14px;
+}
+
+.letterboxd-window__film { display: flex; flex-direction: column; gap: 6px; }
+
+.letterboxd-window__film-poster {
+  aspect-ratio: 2 / 3;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--bg-surface-alt);
+  border: 1px solid var(--border-soft);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+}
+.letterboxd-window__film-poster img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.letterboxd-window__film-title {
+  font-family: var(--font-secondary);
+  font-weight: 700;
+  font-size: 11.5px;
+  line-height: 1.35;
+}

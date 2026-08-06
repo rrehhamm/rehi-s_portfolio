@@ -1,0 +1,115 @@
+.dock {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3000;
+  transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Auto-hide: slide down, leaving a thin sliver so the dock stays
+   discoverable without permanently occupying the bottom edge. */
+.dock--hidden {
+  transform: translateX(-50%) translateY(calc(100% - 5px));
+}
+[data-reduce-motion="true"] .dock { transition: none; }
+
+.dock__list {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  list-style: none;
+  margin: 0;
+  padding: 10px 14px;
+  background: color-mix(in srgb, var(--bg-surface) 75%, transparent);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+}
+
+.dock__item-wrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.dock__item {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  box-shadow: var(--shadow-sm);
+}
+
+.dock__item--active {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.dock__indicator {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--accent);
+  margin-top: 4px;
+}
+
+.dock__divider {
+  width: 1px;
+  align-self: stretch;
+  background: var(--border-soft);
+  margin: 4px 4px;
+}
+
+/* Tablet: same floating pill, just a little smaller. */
+@media (min-width: 769px) and (max-width: 1080px) {
+  .dock__list { gap: 5px; padding: 9px 12px; }
+  .dock__item { width: 40px; height: 40px; }
+}
+
+/* Mobile: a real bottom navigation bar, not a floating pill — full width,
+   flush with the bottom edge, always visible (auto-hide is a desktop-only
+   concept), never overlapping window content because Window.jsx reserves
+   its height on mobile. */
+.dock--mobile {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: auto;
+  transform: none;
+  width: 100%;
+  z-index: 3000;
+}
+.dock--mobile.dock--hidden { transform: none; }
+
+.dock--mobile .dock__list {
+  border-radius: 0;
+  border: none;
+  border-top: 1px solid var(--border-soft);
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+  padding: 8px 10px calc(8px + env(safe-area-inset-bottom, 0px));
+  gap: 4px;
+}
+
+.dock--mobile .dock__item {
+  width: 42px;
+  height: 42px;
+}
+
+.dock--mobile .dock__divider { display: none; }
+
+@media (max-width: 420px) {
+  .dock__list { max-width: 94vw; overflow-x: auto; }
+  .dock--mobile .dock__list { max-width: none; overflow-x: visible; }
+}

@@ -1,0 +1,88 @@
+.desktop-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  width: 72px;
+  min-height: 88px;
+  padding: 8px 6px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  text-align: center;
+}
+
+.desktop-icon:hover {
+  background: rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(4px);
+}
+
+.desktop-icon--selected {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.desktop-icon--positioned {
+  cursor: grab;
+  touch-action: none;
+}
+
+.desktop-icon--dragging {
+  cursor: grabbing;
+  z-index: 20;
+  background: rgba(255, 255, 255, 0.24);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.4);
+}
+
+.desktop-icon__glyph {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 6px 10px rgba(0,0,0,0.25));
+}
+
+.desktop-icon:nth-of-type(10) .desktop-icon__glyph,
+.desktop-icon[aria-label*="locked"] .desktop-icon__glyph {
+  animation: none;
+}
+
+.desktop-icon[aria-label*="locked"]:hover .desktop-icon__glyph {
+  animation: icon-shake 0.4s ease;
+}
+
+@keyframes icon-shake {
+  0%, 100% { transform: rotate(0); }
+  20% { transform: rotate(-6deg); }
+  40% { transform: rotate(5deg); }
+  60% { transform: rotate(-4deg); }
+  80% { transform: rotate(3deg); }
+}
+
+.desktop-icon__label {
+  font-family: var(--font-secondary);
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--color-warm-white);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.55), 0 0 12px rgba(0,0,0,0.25);
+  line-height: 1.2;
+  word-break: break-word;
+  text-align: center;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.file-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-warm-white);
+  background: rgba(255,255,255,0.12);
+  border-radius: 10px;
+}
+
+@media (max-width: 768px) {
+  .desktop-icon { width: 68px; min-height: 82px; padding: 8px 4px; }
+  .desktop-icon__label { font-size: 11px; }
+}
