@@ -140,12 +140,15 @@ export function findNearestFreeIconCell(dropPosition, bounds, obstacles, margin 
 }
 
 /**
- * Builds the invisible icon grid and assigns each icon to the nearest free
- * cell, preferring the edge column it started closest to. Cells that fall
- * inside the reserved center band (wallpaper subject) or overlap a widget
- * rect are skipped entirely.
+ * Builds the invisible icon grid and assigns each icon a spot, preferring
+ * its explicit default target (see DEFAULT_ICON_LAYOUT in constants.js) when
+ * one is given and actually free; otherwise falls back to the nearest free
+ * cell on that side (nearest to its own edge, top to bottom), so a target
+ * that's blocked by a widget — or an icon with no target at all — still
+ * always lands somewhere valid. Cells that fall inside the reserved center
+ * band (wallpaper subject) or overlap a widget rect are skipped entirely.
  */
-export function resolveIconLayout({ leftIds, rightIds, bounds, widgetRects }) {
+export function resolveIconLayout({ leftIds, rightIds, bounds, widgetRects, defaultLayout = {} }) {
   const usableWidth = bounds.right - bounds.left;
   const reservedLeft = bounds.left + usableWidth * 0.3;
   const reservedRight = bounds.left + usableWidth * 0.7;
@@ -169,29 +172,110 @@ export function resolveIconLayout({ leftIds, rightIds, bounds, widgetRects }) {
 
   const occupied = new Set();
   const positions = {};
+  const strandedCounts = new Map();
 
-  const place = (ids, columns) => {
-    ids.forEach((id) => {
-      let placed = false;
-      for (let c = 0; c < columns.length && !placed; c++) {
-        for (let r = 0; r < rows.length && !placed; r++) {
-          const key = `${c}:${r}`;
-          if (occupied.has(key)) continue;
-          if (cellBlocked(columns[c], rows[r])) continue;
-          occupied.add(key);
-          positions[id] = { x: columns[c], y: rows[r] };
-          placed = true;
-        }
+  // Places a single icon at the nearest free cell on its side (column-major
+  // from the edge). Keys are namespaced by side so the left and right zones
+  // — which reuse the same small column/row indices for entirely different
+  // physical columns — never mistake each other's cells as occupied. This is
+  // both the fallback for icons with no target and the safety net for a
+  // target row/group that turned out to be blocked, taken, or unreachable.
+  const placeFallback = (id, side, columns) => {
+    for (let c = 0; c < columns.length; c++) {
+      for (let r = 0; r < rows.length; r++) {
+        const key = `${side}:${c}:${r}`;
+        if (occupied.has(key)) continue;
+        if (cellBlocked(columns[c], rows[r])) continue;
+        occupied.add(key);
+        positions[id] = { x: columns[c], y: rows[r] };
+        return;
       }
-      if (!placed) {
-        // Degenerate fallback — desktop is extremely small or fully blocked.
-        positions[id] = { x: bounds.left, y: bounds.top };
-      }
-    });
+    }
+    // Truly nothing free anywhere in the visible grid on this side (desktop
+    // is extremely small) — extend a virtual sub-grid downward past the last
+    // real row, wrapping across this side's own columns, so every stranded
+    // icon still gets its own full-size, non-overlapping cell. Side-aware
+    // (uses this side's own columns) so a stranded right-side icon never
+    // lands on the left edge on top of a left-side icon. This may push an
+    // icon below the visible desktop area on truly tiny viewports, which is
+    // an acceptable last resort — icon-on-icon overlap is not.
+    const strandedIndex = strandedCounts.get(side) || 0;
+    strandedCounts.set(side, strandedIndex + 1);
+    const perRow = Math.max(1, columns.length);
+    const wrapRow = Math.floor(strandedIndex / perRow);
+    const wrapCol = strandedIndex % perRow;
+    const fallbackX = columns[wrapCol] ?? bounds.left;
+    const fallbackY = bounds.top + (rows.length + wrapRow) * GRID_CELL_HEIGHT;
+    positions[id] = { x: fallbackX, y: fallbackY };
   };
 
-  place(leftIds, leftColumns);
-  place(rightIds, rightColumns);
+  const place = (ids, side, columns) => {
+    // Icons with an explicit target for this side are grouped by their
+    // intended row, so a whole row of icons is placed together or not at
+    // all — this is what prevents two different target rows from silently
+    // clamping down onto the same actual row on short viewports and
+    // colliding. Groups are tried in ascending target-row order, each one
+    // searching forward from wherever the previous group landed, so the
+    // literal row numbers in DEFAULT_ICON_LAYOUT are only a preference —
+    // correctness (no overlaps) never depends on them being reachable.
+    const withTarget = ids.filter((id) => defaultLayout[id]?.side === side);
+    const withoutTarget = ids.filter((id) => !(defaultLayout[id]?.side === side));
+
+    const rowGroups = new Map();
+    withTarget.forEach((id) => {
+      const target = defaultLayout[id];
+      const members = rowGroups.get(target.row) || [];
+      members.push({ id, col: target.col });
+      rowGroups.set(target.row, members);
+    });
+
+    const orderedGroups = [...rowGroups.entries()].sort((a, b) => a[0] - b[0]);
+
+    let searchFromRow = 0;
+    orderedGroups.forEach(([, members]) => {
+      members.sort((a, b) => a.col - b.col);
+
+      // If this side doesn't have enough columns for the group's distinct
+      // target columns to stay distinct once clamped (narrow viewport), two
+      // members would land on the exact same cell no matter which row is
+      // picked — skip the group search entirely and place each member
+      // individually instead.
+      const clampedCols = members.map(({ col }) => Math.min(col, columns.length - 1));
+      const hasColumnClash = new Set(clampedCols).size !== clampedCols.length;
+
+      let foundRow = -1;
+      if (!hasColumnClash) {
+        for (let r = searchFromRow; r < rows.length; r++) {
+          const allClear = members.every(({ col }) => {
+            const c = Math.min(col, columns.length - 1);
+            return !occupied.has(`${side}:${c}:${r}`) && !cellBlocked(columns[c], rows[r]);
+          });
+          if (allClear) {
+            foundRow = r;
+            break;
+          }
+        }
+      }
+
+      if (foundRow !== -1) {
+        members.forEach(({ id, col }) => {
+          const c = Math.min(col, columns.length - 1);
+          occupied.add(`${side}:${c}:${foundRow}`);
+          positions[id] = { x: columns[c], y: rows[foundRow] };
+        });
+        searchFromRow = foundRow + 1;
+      } else {
+        // No row could fit the whole group as-is (very short viewport) —
+        // place each member individually instead of leaving it stranded.
+        members.forEach(({ id }) => placeFallback(id, side, columns));
+      }
+    });
+
+    withoutTarget.forEach((id) => placeFallback(id, side, columns));
+  };
+
+  place(leftIds, "left", leftColumns);
+  place(rightIds, "right", rightColumns);
 
   return positions;
 }

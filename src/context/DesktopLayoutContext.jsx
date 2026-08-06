@@ -2,9 +2,9 @@ import { createContext, useContext, useState, useCallback, useEffect, useMemo, u
 import {
   getDesktopBounds, clampWidgetToDesktop, isPositionValid, rectFrom, rectsOverlap,
   findNearestFreePosition, findNearestFreeIconCell, resolveIconLayout,
-  ICON_BOX_WIDTH, ICON_BOX_HEIGHT, ICON_COLLISION_MARGIN,
+  ICON_BOX_WIDTH, ICON_BOX_HEIGHT, ICON_COLLISION_MARGIN, GRID_CELL_HEIGHT,
 } from "../utils/layoutMath";
-import { DESKTOP_ICONS } from "../utils/constants";
+import { DESKTOP_ICONS, DEFAULT_ICON_LAYOUT } from "../utils/constants";
 
 const DesktopLayoutContext = createContext(null);
 
@@ -19,8 +19,12 @@ const ICON_POSITIONS_KEY = "desktopIconPositions";
 const DESKTOP_LAYOUT_VERSION = 2;
 const LAYOUT_VERSION_KEY = "desktopLayoutVersion";
 
-const LEFT_ICON_IDS = DESKTOP_ICONS.slice(0, 5).map((i) => i.id);
-const RIGHT_ICON_IDS = DESKTOP_ICONS.slice(5).map((i) => i.id);
+// Which side of the desktop each icon defaults to — derived from
+// DEFAULT_ICON_LAYOUT so the grouping always matches the intended default
+// arrangement (see constants.js). Icons with no entry there simply fall
+// back to whichever side has room, via resolveIconLayout's generic scan.
+const LEFT_ICON_IDS = DESKTOP_ICONS.map((i) => i.id).filter((id) => DEFAULT_ICON_LAYOUT[id]?.side === "left");
+const RIGHT_ICON_IDS = DESKTOP_ICONS.map((i) => i.id).filter((id) => DEFAULT_ICON_LAYOUT[id]?.side !== "left");
 
 function readStoredPosition(key) {
   try {
@@ -94,8 +98,13 @@ function migrateIconPositions(bounds) {
 function defaultWelcomePosition(bounds) {
   return clampWidgetToDesktop({ x: bounds.right - WELCOME_DEFAULT_SIZE.width - 8, y: bounds.top + 8 }, WELCOME_DEFAULT_SIZE, bounds);
 }
+// Default spot: left edge, just below the top row of icons — matches the
+// intended out-of-the-box arrangement (see DEFAULT_ICON_LAYOUT). The extra
+// +16 keeps it clear of that row's own grid cell (icon-grid collision
+// checks include a small padding, so sitting exactly on the boundary would
+// wrongly read as blocking the row above it).
 function defaultSpotifyPosition(bounds) {
-  return clampWidgetToDesktop({ x: bounds.right - SPOTIFY_DEFAULT_SIZE.width - 8, y: bounds.bottom - SPOTIFY_DEFAULT_SIZE.height - 8 }, SPOTIFY_DEFAULT_SIZE, bounds);
+  return clampWidgetToDesktop({ x: bounds.left, y: bounds.top + GRID_CELL_HEIGHT + 16 }, SPOTIFY_DEFAULT_SIZE, bounds);
 }
 
 function getViewport() {
@@ -285,7 +294,7 @@ export function DesktopLayoutProvider({ children }) {
     const leftRemaining = LEFT_ICON_IDS.filter((id) => !(id in iconOverrides));
     const rightRemaining = RIGHT_ICON_IDS.filter((id) => !(id in iconOverrides));
 
-    const gridPositions = resolveIconLayout({ leftIds: leftRemaining, rightIds: rightRemaining, bounds, widgetRects });
+    const gridPositions = resolveIconLayout({ leftIds: leftRemaining, rightIds: rightRemaining, bounds, widgetRects, defaultLayout: DEFAULT_ICON_LAYOUT });
     return { ...gridPositions, ...iconOverrides };
   }, [welcome.visible, welcome.position, welcome.size, spotify.visible, spotify.position, spotify.size, bounds, iconOverrides]);
 
